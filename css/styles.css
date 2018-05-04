@@ -39,6 +39,12 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
   background-color: #f3f3f3;
   min-height: 100%;
 }
+
+.content-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 #footer {
   background-color: #444;
   color: #aaa;
@@ -50,6 +56,7 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
 }
 /* ====================== Navigation ====================== */
 nav {
+  display: flex;
   width: 100%;
   height: 80px;
   background-color: #252831;
@@ -105,8 +112,11 @@ nav h1 a {
 }
 /* ====================== Restaurant Filtering ====================== */
 .filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  padding-top: 10px;
   width: 100%;
-  height: 50px;
+  height: 100%;
   background-color: #3397DB;
   align-items: center;
 }
@@ -116,6 +126,7 @@ nav h1 a {
   font-weight: normal;
   line-height: 1;
   margin: 0 20px;
+  width: 100%;
 }
 .filter-options select {
   background-color: white;
@@ -129,9 +140,17 @@ nav h1 a {
   width: 200px;
 }
 
+@media (max-width: 475px) {
+  .filter-options select {
+    width: 100%;
+  }
+}
+
 /* ====================== Restaurant Listing ====================== */
 #restaurants-list {
   background-color: #f3f3f3;
+  display: flex;
+  flex-wrap: wrap;
   list-style: outside none none;
   margin: 0;
   padding: 30px 15px 60px;
@@ -140,9 +159,9 @@ nav h1 a {
 #restaurants-list li {
   background-color: #fff;
   border: 2px solid #ccc;
+  flex: 1 1 auto;
   font-family: Arial,sans-serif;
   margin: 15px;
-  min-height: 380px;
   padding: 0 30px 25px;
   text-align: left;
   width: 270px;
@@ -152,7 +171,6 @@ nav h1 a {
   display: block;
   margin: 0;
   max-width: 100%;
-  min-height: 248px;
   min-width: 100%;
 }
 #restaurants-list li h1 {
@@ -180,6 +198,12 @@ nav h1 a {
   text-align: center;
   text-decoration: none;
   text-transform: uppercase;
+}
+
+@media (max-width: 400px) {
+  #restaurants-list li {
+    width: 100%;
+  }
 }
 
 /* ====================== Restaurant Details ====================== */
@@ -240,7 +264,7 @@ nav h1 a {
   border-bottom: 1px solid #d9d9d9;
   border-top: 1px solid #fff;
   padding: 140px 40px 30px;
-  width: 50%;
+  width: calc(50% - 40px);
 }
 #reviews-container {
   padding: 30px 40px 80px;
@@ -272,4 +296,9 @@ nav h1 a {
 }
 #restaurant-hours td {
   color: #666;
+}
+/* ====================== Restaurant Footer ====================== */
+#footer span {
+  display: inline-block;
+  margin: 0 10px;
 }
