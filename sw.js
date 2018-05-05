@@ -20,22 +20,6 @@ self.addEventListener('install', function(event) {
     );
 });
 
-self.addEventListener('activate', function(event) {
-    event.waitUntil(
-        // Remove old caches
-        caches.keys().then(function(cacheNames) {
-            return Promise.all(
-                cacheNames.filter(function(cacheName) {
-                    return cacheName.startsWith('mws-restaurant-') &&
-                        !allCaches.includes(cacheName);
-                }).map(function(cacheName) {
-                    return caches.delete(cacheName);
-                })
-            );
-        })
-    );
-});
-
 self.addEventListener('fetch', function(event) {
     // Return matched cache resource
     // otherwise fetch from network and store in cache

@@ -11,20 +11,7 @@ var markers = [];
     if (!navigator.serviceWorker) return;
 
     navigator.serviceWorker.register('sw.js').then(function(reg) {
-        if (!navigator.serviceWorker.controller) return;
-
-        if (reg.waiting) {
-            updateReady(reg.waiting);
-            return;
-        }
-
-        if (reg.installing) {
-            return;
-        }
-
-        reg.addEventListener('updatefound', function() {
-            return;
-        });
+        console.log("Service worker registered.")
     });
 })();
 
