@@ -63,6 +63,17 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
     text-transform: uppercase;
 }
 
+.skip-link {
+    left: 0;
+    position: absolute;
+    top: -9999px;
+}
+
+.skip-link:focus {
+    top: 0;
+    z-index: 2000;
+}
+
 .sr-only {
     border: 0;
     clip: rect(0 0 0 0);
