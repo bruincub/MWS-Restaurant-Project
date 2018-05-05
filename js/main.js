@@ -10,7 +10,7 @@ var markers = [];
 (function serviceWorker() {
     if (!navigator.serviceWorker) return;
 
-    navigator.serviceWorker.register("sw.js").then(function(reg) {
+    navigator.serviceWorker.register('sw.js').then(function(reg) {
         if (!navigator.serviceWorker.controller) return;
 
         if (reg.waiting) {
@@ -22,7 +22,7 @@ var markers = [];
             return;
         }
 
-        reg.addEventListener("updatefound", function() {
+        reg.addEventListener('updatefound', function() {
             return;
         });
     });
