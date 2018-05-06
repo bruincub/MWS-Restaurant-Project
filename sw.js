@@ -34,16 +34,6 @@ self.addEventListener('install', function(event) {
 });
 
 self.addEventListener('fetch', function(event) {
-    const requestUrl = new URL(event.request.url);
-
-    // Handle root path
-    if (requestUrl.origin === location.origin) {
-        if (requestUrl.pathname === '/') {
-            event.respondWith(caches.match('index.html'));
-            return;
-        }
-    }
-
     // Return matched cache resource
     // otherwise fetch from network and store in cache
     event.respondWith(
