@@ -16,13 +16,20 @@ document.addEventListener('DOMContentLoaded', (event) => {
  * Fetch all neighborhoods and set their HTML.
  */
 fetchNeighborhoods = () => {
-    WSHelper.fetchNeighborhoods((error, neighborhoods) => {
-        if (error) { // Got an error
-            console.error(error);
-        } else {
-            self.neighborhoods = neighborhoods;
-            fillNeighborhoodsHTML();
-        }
+    // WSHelper.fetchNeighborhoods((error, neighborhoods) => {
+    //     if (error) { // Got an error
+    //         console.error(error);
+    //     } else {
+    //         self.neighborhoods = neighborhoods;
+    //         fillNeighborhoodsHTML();
+    //     }
+    // });
+
+    WSHelper.fetchNeighborhoods().then(function(neighborhoods) {
+        self.neighborhoods = neighborhoods;
+        fillNeighborhoodsHTML();
+    }).catch(function(error) {
+        console.log(error);
     });
 };
 
