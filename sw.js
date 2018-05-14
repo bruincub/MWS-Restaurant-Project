@@ -13,7 +13,7 @@ self.addEventListener('install', function(event) {
                 'index.html',
                 'restaurant.html',
                 'js/common.js',
-                'js/dbhelper.js',
+                'js/wshelper.js',
                 'js/main.js',
                 'js/restaurant_info.js',
                 'css/styles.css',
