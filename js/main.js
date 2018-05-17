@@ -50,14 +50,19 @@ fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
  * Fetch all cuisines and set their HTML.
  */
 fetchCuisines = () => {
-    WSHelper.fetchCuisines((error, cuisines) => {
-        if (error) { // Got an error!
-            console.error(error);
-        } else {
-            self.cuisines = cuisines;
-            fillCuisinesHTML();
-        }
-    });
+    // WSHelper.fetchCuisines((error, cuisines) => {
+    //     if (error) { // Got an error!
+    //         console.error(error);
+    //     } else {
+    //         self.cuisines = cuisines;
+    //         fillCuisinesHTML();
+    //     }
+    // });
+
+    WSHelper.fetchCuisines().then(function(cuisines) {
+        self.cuisines = cuisines;
+        fillCuisinesHTML();
+    })
 };
 
 /**

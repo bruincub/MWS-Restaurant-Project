@@ -128,9 +128,9 @@ class WSHelper {
         //     }
         // });
 
-        return WSHelper.fetchRestaurants().then(function(json) {
+        return WSHelper.fetchRestaurants().then(function(restaurants) {
             // Get all neighborhoods from all restaurants
-            const neighborhoods = json.map((v, i) => json[i].neighborhood);
+            const neighborhoods = restaurants.map((v, i) => restaurants[i].neighborhood);
             // Remove duplicates from neighborhoods
             const uniqueNeighborhoods = neighborhoods.filter((v, i) => neighborhoods.indexOf(v) == i);
 
@@ -141,19 +141,28 @@ class WSHelper {
     /**
      * Fetch all cuisines with proper error handling.
      */
-    static fetchCuisines(callback) {
+    static fetchCuisines() {
         // Fetch all restaurants
-        WSHelper.fetchRestaurants((error, restaurants) => {
-            if (error) {
-                callback(error, null);
-            } else {
-                // Get all cuisines from all restaurants
-                const cuisines = restaurants.map((v, i) => restaurants[i].cuisine_type)
-                // Remove duplicates from cuisines
-                const uniqueCuisines = cuisines.filter((v, i) => cuisines.indexOf(v) == i)
-                callback(null, uniqueCuisines);
-            }
-        });
+        // WSHelper.fetchRestaurants((error, restaurants) => {
+        //     if (error) {
+        //         callback(error, null);
+        //     } else {
+        //         // Get all cuisines from all restaurants
+        //         const cuisines = restaurants.map((v, i) => restaurants[i].cuisine_type)
+        //         // Remove duplicates from cuisines
+        //         const uniqueCuisines = cuisines.filter((v, i) => cuisines.indexOf(v) == i)
+        //         callback(null, uniqueCuisines);
+        //     }
+        // });
+
+        return WSHelper.fetchRestaurants().then(function(restaurants) {
+            // Get all cuisines from all restaurants
+            const cuisines = restaurants.map((v, i) => restaurants[i].cuisine_type)
+            // Remove duplicates from cuisines
+            const uniqueCuisines = cuisines.filter((v, i) => cuisines.indexOf(v) == i);
+
+            return uniqueCuisines;
+        })
     }
 
     /**
