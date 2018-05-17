@@ -93,21 +93,34 @@ class WSHelper {
     /**
      * Fetch restaurants by a cuisine and a neighborhood with proper error handling.
      */
-    static fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, callback) {
+    static fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood) {
         // Fetch all restaurants
-        WSHelper.fetchRestaurants((error, restaurants) => {
-            if (error) {
-                callback(error, null);
-            } else {
-                let results = restaurants
-                if (cuisine != 'all') { // filter by cuisine
-                    results = results.filter(r => r.cuisine_type == cuisine);
-                }
-                if (neighborhood != 'all') { // filter by neighborhood
-                    results = results.filter(r => r.neighborhood == neighborhood);
-                }
-                callback(null, results);
+        // WSHelper.fetchRestaurants((error, restaurants) => {
+        //     if (error) {
+        //         callback(error, null);
+        //     } else {
+        //         let results = restaurants
+        //         if (cuisine != 'all') { // filter by cuisine
+        //             results = results.filter(r => r.cuisine_type == cuisine);
+        //         }
+        //         if (neighborhood != 'all') { // filter by neighborhood
+        //             results = results.filter(r => r.neighborhood == neighborhood);
+        //         }
+        //         callback(null, results);
+        //     }
+        // });
+
+        return WSHelper.fetchRestaurants().then(function(restaurants) {
+            let results = restaurants;
+            if (cuisine != 'all') { // filter by cuisine
+                results = results.filter(r => r.cuisine_type == cuisine);
             }
+
+            if (neighborhood != 'all') { // filter by neighborhood
+                results = results.filter(r => r.neighborhood == neighborhood);
+            }
+
+            return results;
         });
     }
 

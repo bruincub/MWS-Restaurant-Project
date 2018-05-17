@@ -62,7 +62,9 @@ fetchCuisines = () => {
     WSHelper.fetchCuisines().then(function(cuisines) {
         self.cuisines = cuisines;
         fillCuisinesHTML();
-    })
+    }).catch(function(error) {
+        console.log(error);
+    });
 };
 
 /**
@@ -108,14 +110,22 @@ updateRestaurants = () => {
     const cuisine = cSelect[cIndex].value;
     const neighborhood = nSelect[nIndex].value;
 
-    WSHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (error, restaurants) => {
-        if (error) { // Got an error!
-            console.error(error);
-        } else {
-            resetRestaurants(restaurants);
-            fillRestaurantsHTML();
-        }
-    })
+    // WSHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (error, restaurants) => {
+    //     if (error) { // Got an error!
+    //         console.error(error);
+    //     } else {
+    //         resetRestaurants(restaurants);
+    //         fillRestaurantsHTML();
+    //     }
+    // })
+
+    WSHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood).then(function(restaurants) {
+        resetRestaurants(restaurants);
+        fillRestaurantsHTML();
+    }).catch(function(error) {
+        console.log(error);
+    });
+
 };
 
 /**
