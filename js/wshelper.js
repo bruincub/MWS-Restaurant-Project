@@ -16,7 +16,7 @@ class WSHelper {
      * Fetch all restaurants.
      */
     static fetchRestaurants() {
-        return fetch(WSHelper.WS_URL + '/restaurants').then(function(response) {
+        return fetch(WSHelper.WS_URL + `/restaurants`).then(function(response) {
            if (response.ok) {
                return response.json();
            } else {
@@ -42,18 +42,26 @@ class WSHelper {
     /**
      * Fetch a restaurant by its ID.
      */
-    static fetchRestaurantById(id, callback) {
+    static fetchRestaurantById(id) {
         // fetch all restaurants with proper error handling.
-        WSHelper.fetchRestaurants((error, restaurants) => {
-            if (error) {
-                callback(error, null);
+        // WSHelper.fetchRestaurants((error, restaurants) => {
+        //     if (error) {
+        //         callback(error, null);
+        //     } else {
+        //         const restaurant = restaurants.find(r => r.id == id);
+        //         if (restaurant) { // Got the restaurant
+        //             callback(null, restaurant);
+        //         } else { // Restaurant does not exist in the database
+        //             callback('Restaurant does not exist', null);
+        //         }
+        //     }
+        // });
+
+        return fetch(WSHelper.WS_URL + `/restaurants/${id}`).then(function(response) {
+            if (response.ok) {
+                return response.json();
             } else {
-                const restaurant = restaurants.find(r => r.id == id);
-                if (restaurant) { // Got the restaurant
-                    callback(null, restaurant);
-                } else { // Restaurant does not exist in the database
-                    callback('Restaurant does not exist', null);
-                }
+                throw Error(`Status: ${response.status}. ${response.statusText}`);
             }
         });
     }

@@ -33,14 +33,24 @@ fetchRestaurantFromURL = (callback) => {
         error = 'No restaurant id in URL'
         callback(error, null);
     } else {
-        WSHelper.fetchRestaurantById(id, (error, restaurant) => {
+        // WSHelper.fetchRestaurantById(id, (error, restaurant) => {
+        //     self.restaurant = restaurant;
+        //     if (!restaurant) {
+        //         console.error(error);
+        //         return;
+        //     }
+        //     fillRestaurantHTML();
+        //     callback(null, restaurant)
+        // });
+
+        WSHelper.fetchRestaurantById(id).then(function(restaurant) {
             self.restaurant = restaurant;
             if (!restaurant) {
                 console.error(error);
                 return;
             }
             fillRestaurantHTML();
-            callback(null, restaurant)
+            callback(null, restaurant);
         });
     }
 };
