@@ -1,8 +1,8 @@
 let restaurants,
     neighborhoods,
-    cuisines;
-var map;
-var markers = [];
+    cuisines
+var map
+var markers = []
 
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
@@ -16,22 +16,15 @@ document.addEventListener('DOMContentLoaded', (event) => {
  * Fetch all neighborhoods and set their HTML.
  */
 fetchNeighborhoods = () => {
-    // WSHelper.fetchNeighborhoods((error, neighborhoods) => {
-    //     if (error) { // Got an error
-    //         console.error(error);
-    //     } else {
-    //         self.neighborhoods = neighborhoods;
-    //         fillNeighborhoodsHTML();
-    //     }
-    // });
-
-    WSHelper.fetchNeighborhoods().then(function(neighborhoods) {
-        self.neighborhoods = neighborhoods;
-        fillNeighborhoodsHTML();
-    }).catch(function(error) {
-        console.log(error);
+    WSHelper.fetchNeighborhoods((error, neighborhoods) => {
+        if (error) { // Got an error
+            console.error(error);
+        } else {
+            self.neighborhoods = neighborhoods;
+            fillNeighborhoodsHTML();
+        }
     });
-};
+}
 
 /**
  * Set neighborhoods HTML.
@@ -44,28 +37,21 @@ fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
         option.value = neighborhood;
         select.append(option);
     });
-};
+}
 
 /**
  * Fetch all cuisines and set their HTML.
  */
 fetchCuisines = () => {
-    // WSHelper.fetchCuisines((error, cuisines) => {
-    //     if (error) { // Got an error!
-    //         console.error(error);
-    //     } else {
-    //         self.cuisines = cuisines;
-    //         fillCuisinesHTML();
-    //     }
-    // });
-
-    WSHelper.fetchCuisines().then(function(cuisines) {
-        self.cuisines = cuisines;
-        fillCuisinesHTML();
-    }).catch(function(error) {
-        console.log(error);
+    WSHelper.fetchCuisines((error, cuisines) => {
+        if (error) { // Got an error!
+            console.error(error);
+        } else {
+            self.cuisines = cuisines;
+            fillCuisinesHTML();
+        }
     });
-};
+}
 
 /**
  * Set cuisines HTML.
@@ -79,7 +65,7 @@ fillCuisinesHTML = (cuisines = self.cuisines) => {
         option.value = cuisine;
         select.append(option);
     });
-};
+}
 
 /**
  * Initialize Google map, called from HTML.
@@ -95,7 +81,7 @@ window.initMap = () => {
         scrollwheel: false
     });
     updateRestaurants();
-};
+}
 
 /**
  * Update page and map for current restaurants.
@@ -110,23 +96,15 @@ updateRestaurants = () => {
     const cuisine = cSelect[cIndex].value;
     const neighborhood = nSelect[nIndex].value;
 
-    // WSHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (error, restaurants) => {
-    //     if (error) { // Got an error!
-    //         console.error(error);
-    //     } else {
-    //         resetRestaurants(restaurants);
-    //         fillRestaurantsHTML();
-    //     }
-    // })
-
-    WSHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood).then(function(restaurants) {
-        resetRestaurants(restaurants);
-        fillRestaurantsHTML();
-    }).catch(function(error) {
-        console.log(error);
-    });
-
-};
+    WSHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (error, restaurants) => {
+        if (error) { // Got an error!
+            console.error(error);
+        } else {
+            resetRestaurants(restaurants);
+            fillRestaurantsHTML();
+        }
+    })
+}
 
 /**
  * Clear current restaurants, their HTML and remove their map markers.
@@ -141,7 +119,7 @@ resetRestaurants = (restaurants) => {
     self.markers.forEach(m => m.setMap(null));
     self.markers = [];
     self.restaurants = restaurants;
-};
+}
 
 /**
  * Create all restaurants HTML and add them to the webpage.
@@ -152,7 +130,7 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
         ul.append(createRestaurantHTML(restaurant));
     });
     addMarkersToMap();
-};
+}
 
 /**
  * Create restaurant HTML.
@@ -162,7 +140,6 @@ createRestaurantHTML = (restaurant) => {
 
     const image = document.createElement('img');
     image.className = 'restaurant-img';
-    image.alt = restaurant.alt_text;
     image.src = WSHelper.imageUrlForRestaurant(restaurant);
     li.append(image);
 
@@ -180,12 +157,11 @@ createRestaurantHTML = (restaurant) => {
 
     const more = document.createElement('a');
     more.innerHTML = 'View Details';
-    more.setAttribute('aria-label', 'View details for ' + restaurant.name);
     more.href = WSHelper.urlForRestaurant(restaurant);
-    li.append(more);
+    li.append(more)
 
-    return li;
-};
+    return li
+}
 
 /**
  * Add markers for current restaurants to the map.
@@ -199,4 +175,4 @@ addMarkersToMap = (restaurants = self.restaurants) => {
         });
         self.markers.push(marker);
     });
-};
+}

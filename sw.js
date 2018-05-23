@@ -15,6 +15,7 @@ self.addEventListener('install', function(event) {
                 'js/common.js',
                 'js/wshelper.js',
                 'js/main.js',
+                'js/idb/idb.js',
                 'js/restaurant_info.js',
                 'css/styles.css',
                 'img/1.jpg',
@@ -26,25 +27,32 @@ self.addEventListener('install', function(event) {
                 'img/7.jpg',
                 'img/8.jpg',
                 'img/9.jpg',
-                'img/10.jpg',
-                'data/restaurants.json'
+                'img/10.jpg'
             ]);
         })
     );
 });
 
 self.addEventListener('fetch', function(event) {
-    // Return matched cache resource
-    // otherwise fetch from network and store in cache
-    event.respondWith(
-        caches.open(staticCache).then(function(cache) {
-            return cache.match(event.request).then(function(response) {
-                return response || fetch(event.request).then(function(response) {
-                    cache.put(event.request, response.clone());
-                    return response;
+    let requestUrl = new URL(event.request.url);
+
+    if (requestUrl.origin === 'http://localhost:1337') {
+        // Store in IDB
+    } else {
+        // Return matched cache resource
+        // otherwise fetch from network and store in cache
+        event.respondWith(
+            caches.open(staticCache).then(function(cache) {
+                return cache.match(event.request).then(function(response) {
+                    return response || fetch(event.request).then(function(response) {
+                        cache.put(event.request, response.clone());
+                        return response;
+                    });
                 });
-            });
-        })
-    );
+            })
+        );
+    }
+
+
 });
 

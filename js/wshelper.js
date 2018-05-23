@@ -15,34 +15,39 @@ class WSHelper {
     /**
      * Fetch all restaurants.
      */
-    static fetchRestaurants() {
-        return fetch(WSHelper.WS_URL + `/restaurants`).then(function(response) {
-           if (response.ok) {
-               return response.json();
-           } else {
-               throw Error(`Status: ${response.status}. ${response.statusText}`);
-           }
-        });
-
+    static fetchRestaurants(callback) {
         // let xhr = new XMLHttpRequest();
         // xhr.open('GET', WSHelper.WS_URL);
         // xhr.onload = () => {
-        //   if (xhr.status === 200) { // Got a success response from server!
-        //     const json = JSON.parse(xhr.responseText);
-        //     const restaurants = json.restaurants;
-        //     callback(null, restaurants);
-        //   } else { // Oops!. Got an error from server.
-        //     const error = (`Request failed. Returned status of ${xhr.status}`);
-        //     callback(error, null);
-        //   }
+        //     if (xhr.status === 200) { // Got a success response from server!
+        //         const json = JSON.parse(xhr.responseText);
+        //         const restaurants = json.restaurants;
+        //         callback(null, restaurants);
+        //     } else { // Oops!. Got an error from server.
+        //         const error = (`Request failed. Returned status of ${xhr.status}`);
+        //         callback(error, null);
+        //     }
         // };
         // xhr.send();
+
+        fetch(WSHelper.WS_URL + `/Restaurants`).then(function(response) {
+            if (response.ok) {
+                return response.json();
+            } else {
+                const error = (`Request failed. Returned status of ${xhr.status}`);
+                callback(error, null);
+            }
+        }).then(function(restaurants) {
+            callback(null, restaurants);
+        }).catch(function(error) {
+           callback(error, null);
+        });
     }
 
     /**
      * Fetch a restaurant by its ID.
      */
-    static fetchRestaurantById(id) {
+    static fetchRestaurantById(id, callback) {
         // fetch all restaurants with proper error handling.
         // WSHelper.fetchRestaurants((error, restaurants) => {
         //     if (error) {
@@ -57,12 +62,17 @@ class WSHelper {
         //     }
         // });
 
-        return fetch(WSHelper.WS_URL + `/restaurants/${id}`).then(function(response) {
+        fetch(WSHelper.WS_URL + `/Restaurants/${id}`).then(function(response) {
             if (response.ok) {
                 return response.json();
             } else {
-                throw Error(`Status: ${response.status}. ${response.statusText}`);
+                const error = (`Request failed. Returned status of ${xhr.status}`);
+                callback(error, null);
             }
+        }).then(function(restaurant) {
+            callback(null, restaurant);
+        }).catch(function(error) {
+            callback(error, null);
         });
     }
 
@@ -101,89 +111,58 @@ class WSHelper {
     /**
      * Fetch restaurants by a cuisine and a neighborhood with proper error handling.
      */
-    static fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood) {
+    static fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, callback) {
         // Fetch all restaurants
-        // WSHelper.fetchRestaurants((error, restaurants) => {
-        //     if (error) {
-        //         callback(error, null);
-        //     } else {
-        //         let results = restaurants
-        //         if (cuisine != 'all') { // filter by cuisine
-        //             results = results.filter(r => r.cuisine_type == cuisine);
-        //         }
-        //         if (neighborhood != 'all') { // filter by neighborhood
-        //             results = results.filter(r => r.neighborhood == neighborhood);
-        //         }
-        //         callback(null, results);
-        //     }
-        // });
-
-        return WSHelper.fetchRestaurants().then(function(restaurants) {
-            let results = restaurants;
-            if (cuisine != 'all') { // filter by cuisine
-                results = results.filter(r => r.cuisine_type == cuisine);
+        WSHelper.fetchRestaurants((error, restaurants) => {
+            if (error) {
+                callback(error, null);
+            } else {
+                let results = restaurants
+                if (cuisine != 'all') { // filter by cuisine
+                    results = results.filter(r => r.cuisine_type == cuisine);
+                }
+                if (neighborhood != 'all') { // filter by neighborhood
+                    results = results.filter(r => r.neighborhood == neighborhood);
+                }
+                callback(null, results);
             }
-
-            if (neighborhood != 'all') { // filter by neighborhood
-                results = results.filter(r => r.neighborhood == neighborhood);
-            }
-
-            return results;
         });
     }
 
     /**
      * Fetch all neighborhoods with proper error handling.
      */
-    static fetchNeighborhoods() {
+    static fetchNeighborhoods(callback) {
         // Fetch all restaurants
-        // WSHelper.fetchRestaurants((error, restaurants) => {
-        //     if (error) {
-        //         callback(error, null);
-        //     } else {
-        //         // Get all neighborhoods from all restaurants
-        //         const neighborhoods = restaurants.map((v, i) => restaurants[i].neighborhood)
-        //         // Remove duplicates from neighborhoods
-        //         const uniqueNeighborhoods = neighborhoods.filter((v, i) => neighborhoods.indexOf(v) == i)
-        //         callback(null, uniqueNeighborhoods);
-        //     }
-        // });
-
-        return WSHelper.fetchRestaurants().then(function(restaurants) {
-            // Get all neighborhoods from all restaurants
-            const neighborhoods = restaurants.map((v, i) => restaurants[i].neighborhood);
-            // Remove duplicates from neighborhoods
-            const uniqueNeighborhoods = neighborhoods.filter((v, i) => neighborhoods.indexOf(v) == i);
-
-            return uniqueNeighborhoods;
+        WSHelper.fetchRestaurants((error, restaurants) => {
+            if (error) {
+                callback(error, null);
+            } else {
+                // Get all neighborhoods from all restaurants
+                const neighborhoods = restaurants.map((v, i) => restaurants[i].neighborhood)
+                // Remove duplicates from neighborhoods
+                const uniqueNeighborhoods = neighborhoods.filter((v, i) => neighborhoods.indexOf(v) == i)
+                callback(null, uniqueNeighborhoods);
+            }
         });
     }
 
     /**
      * Fetch all cuisines with proper error handling.
      */
-    static fetchCuisines() {
+    static fetchCuisines(callback) {
         // Fetch all restaurants
-        // WSHelper.fetchRestaurants((error, restaurants) => {
-        //     if (error) {
-        //         callback(error, null);
-        //     } else {
-        //         // Get all cuisines from all restaurants
-        //         const cuisines = restaurants.map((v, i) => restaurants[i].cuisine_type)
-        //         // Remove duplicates from cuisines
-        //         const uniqueCuisines = cuisines.filter((v, i) => cuisines.indexOf(v) == i)
-        //         callback(null, uniqueCuisines);
-        //     }
-        // });
-
-        return WSHelper.fetchRestaurants().then(function(restaurants) {
-            // Get all cuisines from all restaurants
-            const cuisines = restaurants.map((v, i) => restaurants[i].cuisine_type)
-            // Remove duplicates from cuisines
-            const uniqueCuisines = cuisines.filter((v, i) => cuisines.indexOf(v) == i);
-
-            return uniqueCuisines;
-        })
+        WSHelper.fetchRestaurants((error, restaurants) => {
+            if (error) {
+                callback(error, null);
+            } else {
+                // Get all cuisines from all restaurants
+                const cuisines = restaurants.map((v, i) => restaurants[i].cuisine_type)
+                // Remove duplicates from cuisines
+                const uniqueCuisines = cuisines.filter((v, i) => cuisines.indexOf(v) == i)
+                callback(null, uniqueCuisines);
+            }
+        });
     }
 
     /**
@@ -205,12 +184,11 @@ class WSHelper {
      */
     static mapMarkerForRestaurant(restaurant, map) {
         const marker = new google.maps.Marker({
-                position: restaurant.latlng,
-                title: restaurant.name,
-                url: WSHelper.urlForRestaurant(restaurant),
-                map: map,
-                animation: google.maps.Animation.DROP
-            }
+            position: restaurant.latlng,
+            title: restaurant.name,
+            url: WSHelper.urlForRestaurant(restaurant),
+            map: map,
+            animation: google.maps.Animation.DROP}
         );
         return marker;
     }
