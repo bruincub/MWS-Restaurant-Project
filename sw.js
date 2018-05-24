@@ -36,9 +36,7 @@ self.addEventListener('install', function(event) {
 self.addEventListener('fetch', function(event) {
     let requestUrl = new URL(event.request.url);
 
-    if (requestUrl.origin === 'http://localhost:1337') {
-        // Store in IDB
-    } else {
+    if (requestUrl.origin !== 'http://localhost:1337') {
         // Return matched cache resource
         // otherwise fetch from network and store in cache
         event.respondWith(

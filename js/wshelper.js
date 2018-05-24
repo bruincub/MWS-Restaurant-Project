@@ -2,6 +2,29 @@
  * Common web service helper functions.
  */
 class WSHelper {
+    /**
+     * Open Indexed DB
+     */
+    static openDatabase() {
+        "use strict";
+
+        if (!("indexedDB" in window)) {
+            console.error("IndexedDB is not supported.");
+
+            return Promise.resolve();
+        }
+
+        return idb.open("mws-restaurants", 1, function(upgradeDb) {
+            switch (upgradeDb.oldVersion) {
+                case 0:
+                    upgradeDb.createObjectStore("restaurants", {
+                        keyPath: "id"
+                    });
+            }
+        }).then(function(db) {
+            return db;
+        });
+    }
 
     /**
      * Web service URL.
@@ -32,6 +55,19 @@ class WSHelper {
 
         fetch(WSHelper.WS_URL + `/Restaurants`).then(function(response) {
             if (response.ok) {
+                let restaurants = response.clone().json();
+                const _dbPromise = WSHelper.openDatabase();
+
+                _dbPromise.then(function(db) {
+                    if (!db) return;
+
+                    let tx = db.transaction("restaurants", "readwrite");
+                    let store = tx.objectStore("restaurants");
+                    restaurants.forEach(function(restaurant) {
+                        console.log(restaurant);
+                    });
+                });
+
                 return response.json();
             } else {
                 const error = (`Request failed. Returned status of ${xhr.status}`);
