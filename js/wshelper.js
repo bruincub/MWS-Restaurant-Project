@@ -52,34 +52,36 @@ class WSHelper {
         //     }
         // };
         // xhr.send();
+        const _dbPromise = WSHelper.openDatabase();
 
-        fetch(WSHelper.WS_URL + `/Restaurants`).then(function(response) {
-            if (response.ok) {
-                let restaurants = response.clone().json();
-                const _dbPromise = WSHelper.openDatabase();
+        _dbPromise.then(function(db) {
+            let tx = db.transaction("restaurants", "readwrite");
+            let store = tx.objectStore("restaurants");
 
-                _dbPromise.then(function(db) {
-                    if (!db) return;
+            return store.getAll();
+        }).then(function(restaurants) {
+            callback(null, restaurants);
+        }).catch(function(error) {
+            fetch(WSHelper.WS_URL + `/Restaurants`).then(function(response) {
+                if (response.ok) {
+                    let restaurants = response.clone().json();
 
-                    let tx = db.transaction("restaurants", "readwrite");
-                    let store = tx.objectStore("restaurants");
                     restaurants.then(function(r) {
                         r.forEach(function(restaurant) {
                             store.put(restaurant);
                         });
-                        return tx.complete;
                     });
-                });
 
-                return response.json();
-            } else {
-                const error = (`Request failed. Returned status of ${xhr.status}`);
+                    return response.json();
+                } else {
+                    const error = (`Request failed. Returned status of ${xhr.status}`);
+                    callback(error, null);
+                }
+            }).then(function(restaurants) {
+                callback(null, restaurants);
+            }).catch(function(error) {
                 callback(error, null);
-            }
-        }).then(function(restaurants) {
-            callback(null, restaurants);
-        }).catch(function(error) {
-           callback(error, null);
+            });
         });
     }
 
@@ -119,7 +121,7 @@ class WSHelper {
      * Fetch restaurants by a cuisine type with proper error handling.
      */
     static fetchRestaurantByCuisine(cuisine, callback) {
-        // Fetch all restaurants  with proper error handling
+        // Fetch all restaurants with proper error handling
         WSHelper.fetchRestaurants((error, restaurants) => {
             if (error) {
                 callback(error, null);
