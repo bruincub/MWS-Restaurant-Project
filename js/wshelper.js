@@ -55,34 +55,114 @@ class WSHelper {
         const _dbPromise = WSHelper.openDatabase();
 
         _dbPromise.then(function(db) {
-            let tx = db.transaction("restaurants", "readwrite");
+            let tx = db.transaction("restaurants", "readonly");
             let store = tx.objectStore("restaurants");
 
-            return store.getAll();
-        }).then(function(restaurants) {
-            callback(null, restaurants);
-        }).catch(function(error) {
-            fetch(WSHelper.WS_URL + `/Restaurants`).then(function(response) {
-                if (response.ok) {
-                    let restaurants = response.clone().json();
+            return store.count();
+        }).then(function(count) {
+            if (count) {
+                _dbPromise.then(function(db) {
+                    let tx = db.transaction("restaurants", "readonly");
+                    let store = tx.objectStore("restaurants");
 
-                    restaurants.then(function(r) {
-                        r.forEach(function(restaurant) {
-                            store.put(restaurant);
+                    return store.getAll();
+                }).then(function(restaurants) {
+                    callback(null, restaurants);
+                })
+            } else {
+                fetch(WSHelper.WS_URL + `/Restaurants`).then(function (response) {
+                    if (response.ok) {
+                        _dbPromise.then(function(db) {
+                            let tx2 = db.transaction("restaurants", "readwrite");
+                            let store2 = tx2.objectStore("restaurants");
+
+                            let restaurants = response.clone().json();
+
+                            restaurants.then(function (r) {
+                                r.forEach(function (restaurant) {
+                                    store2.put(restaurant);
+                                });
+                            });
+
+                            return response.json();
+                        }).then(function (restaurants) {
+                            callback(null, restaurants);
                         });
-                    });
+                    } else {
+                        const error = (`Request failed. Returned status of ${xhr.status}`);
+                        callback(error, null);
+                    }
+                });
+            }
+        });
 
-                    return response.json();
+        /*if (count) {
+            _dbPromise.then(function(db) {
+                let tx2 = db.transaction("restaurants", "readonly");
+                let store2 = tx2.objectStore("restaurants");
+
+                return store2.getAll();
+            }).then(function(restaurants) {
+                callback(null, restaurants);
+            })
+        } else {
+            fetch(WSHelper.WS_URL + `/Restaurants`).then(function (response) {
+                if (response.ok) {
+                    _dbPromise.then(function (db) {
+                        let tx3 = db.transaction("restaurants", "readonly");
+                        let store3 = tx3.objectStore("restaurants");
+
+                        let restaurants = response.clone().json();
+
+                        restaurants.then(function (r) {
+                            r.forEach(function (restaurant) {
+                                store3.put(restaurant);
+                            });
+                        });
+
+                        return response.json();
+                    }).then(function (restaurants) {
+                        callback(null, restaurants);
+                    });
                 } else {
                     const error = (`Request failed. Returned status of ${xhr.status}`);
                     callback(error, null);
                 }
-            }).then(function(restaurants) {
-                callback(null, restaurants);
-            }).catch(function(error) {
-                callback(error, null);
             });
-        });
+        }*/
+
+
+        // .then(function(count) {
+        //     _dbPromise.then(function(db) {
+        //         let tx2 = db.transaction("restaurants", "readwrite");
+        //         let store2 = tx2.objectStore("restaurants");
+        //
+        //         if (count) {
+        //             return store2.getAll();
+        //         } else {
+        //             return fetch(WSHelper.WS_URL + `/Restaurants`).then(function (response) {
+        //                 if (response.ok) {
+        //                     let restaurants = response.clone().json();
+        //
+        //                     restaurants.then(function (r) {
+        //                         r.forEach(function (restaurant) {
+        //                             store2.put(restaurant);
+        //                         });
+        //                     });
+        //
+        //                     return response.json();
+        //                 } else {
+        //                     const error = (`Request failed. Returned status of ${xhr.status}`);
+        //                     callback(error, null);
+        //                 }
+        //             });
+        //         }
+        //     });
+        // }).then(function(restaurants) {
+        //         callback(null, restaurants);
+        // }).catch(function(error) {
+        //         callback(error, null);
+        // });
     }
 
     /**
