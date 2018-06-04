@@ -65,6 +65,7 @@ class WSHelper {
                     let tx = db.transaction("restaurants", "readonly");
                     let store = tx.objectStore("restaurants");
 
+                    console.log("getting from db");
                     return store.getAll();
                 }).then(function(restaurants) {
                     callback(null, restaurants);
