@@ -104,7 +104,7 @@ updateRestaurants = () => {
         }
     })
 
-    if (cIndex && nIndex) {
+    if (cIndex || nIndex) {
         document.getElementById("map").style.display = "block";
     }
 }
