@@ -74,18 +74,18 @@ class WSHelper {
                 fetch(WSHelper.WS_URL + `/Restaurants`).then(function (response) {
                     if (response.ok) {
                         _dbPromise.then(function(db) {
-                            let tx2 = db.transaction("restaurants", "readwrite");
-                            let store2 = tx2.objectStore("restaurants");
+                            let tx = db.transaction("restaurants", "readwrite");
+                            let store = tx.objectStore("restaurants");
 
                             let restaurants = response.clone().json();
 
-                            restaurants.then(function (r) {
-                                r.forEach(function (restaurant) {
-                                    store2.put(restaurant);
-                                });
+                            response.json().then(function(r) {
+                                r.forEach(function(restaurant) {
+                                    store.put(restaurant);
+                                })
                             });
 
-                            return response.json();
+                            return restaurants;
                         }).then(function (restaurants) {
                             callback(null, restaurants);
                         });
