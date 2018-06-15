@@ -80,7 +80,6 @@ window.initMap = () => {
         center: loc,
         scrollwheel: false
     });
-    updateRestaurants();
 }
 
 /**
@@ -104,6 +103,10 @@ updateRestaurants = () => {
             fillRestaurantsHTML();
         }
     })
+
+    if (cIndex && nIndex) {
+        document.getElementById("map").style.display = "block";
+    }
 }
 
 /**
