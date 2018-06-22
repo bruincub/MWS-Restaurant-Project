@@ -133,6 +133,29 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
         ul.append(createRestaurantHTML(restaurant));
     });
     addMarkersToMap();
+
+    let lazyImages = [...document.querySelectorAll("img.lazyImg")];
+
+    if ("IntersectionObserver" in window) {
+        let lazyImgObserver = new IntersectionObserver(function(images, observer) {
+            images.forEach(function(image) {
+                if (image.isIntersecting) {
+                    let lazyImg = image.target;
+                    lazyImg.src = lazyImg.dataset.src;
+                    lazyImg.srcset = lazyImg.dataset.srcset;
+                    lazyImg.classList.remove("lazy");
+                    lazyImg.classList.add("restaurant-img");
+                    lazyImgObserver.unobserve(lazyImg);
+                }
+            });
+        });
+
+        lazyImages.forEach(function(lazyImg) {
+            lazyImgObserver.observe(lazyImg);
+        });
+    } else {
+        alert("Intersection Observer is not supported by your browser.");
+    }
 }
 
 /**
@@ -140,10 +163,56 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
  */
 createRestaurantHTML = (restaurant) => {
     const li = document.createElement('li');
+    const imgBasePath = "img/" + WSHelper.imageUrlForRestaurant(restaurant);
 
     const image = document.createElement('img');
-    image.className = 'restaurant-img';
-    image.src = WSHelper.imageUrlForRestaurant(restaurant);
+    // image.className = 'restaurant-img';
+    // image.src = WSHelper.imageUrlForRestaurant(restaurant);
+    image.className = 'lazyImg';
+    image.src = " ";
+    image.setAttribute("data-src", imgBasePath + ".jpg");
+    image.setAttribute("data-srcset", imgBasePath + "-small.jpg 280w, " +
+                                        imgBasePath + "-medium.jpg 400w, " +
+                                        imgBasePath + "-large.jpg 600w");
+    image.setAttribute("sizes", "(max-width: 399px) 280px, (max-width: 599px) 400px, (max-width: 774px) 600px, " +
+                                "280px");
+
+    // Simulate alt text data from database server
+    switch (restaurant.id) {
+        case 1:
+            image.alt = "Patrons enjoying dinner at Mission Chinese Food";
+            break;
+        case 2:
+            image.alt = "Cheese pizza from Emily";
+            break;
+        case 3:
+            image.alt = "Dining room at Kang Ho Dong Baekjeong";
+            break;
+        case 4:
+            image.alt = "Entrance to Katz's Delicatessan";
+            break;
+        case 5:
+            image.alt = "Patrons enjoying casual dining at Roberta's Pizza";
+            break;
+        case 6:
+            image.alt = "Patrons eating in the rustic dining room at Hometown BBQ";
+            break;
+        case 7:
+            image.alt = "Entrance of Superiority Burger";
+            break;
+        case 8:
+            image.alt = "Shop sign that reads 'The Dutch'";
+            break;
+        case 9:
+            image.alt = "Foodie patron taking a photo of her dish";
+            break;
+        case 10:
+            image.alt = "White dining room and bar at Casa Enrique";
+            break;
+        default:
+            image.alt = "";
+    }
+
     li.append(image);
 
     const name = document.createElement('h1');
@@ -161,9 +230,9 @@ createRestaurantHTML = (restaurant) => {
     const more = document.createElement('a');
     more.innerHTML = 'View Details';
     more.href = WSHelper.urlForRestaurant(restaurant);
-    li.append(more)
+    li.append(more);
 
-    return li
+    return li;
 }
 
 /**
