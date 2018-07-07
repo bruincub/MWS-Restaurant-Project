@@ -134,6 +134,7 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
     });
     addMarkersToMap();
 
+    /* https://developers.google.com/web/fundamentals/performance/lazy-loading-guidance/images-and-video/ */
     let lazyImages = [...document.querySelectorAll("img.lazyImg")];
 
     if ("IntersectionObserver" in window) {
