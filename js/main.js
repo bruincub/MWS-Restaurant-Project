@@ -1,13 +1,14 @@
 let restaurants,
     neighborhoods,
-    cuisines
-var map
-var markers = []
+    cuisines;
+var newMap;
+var markers = [];
 
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', (event) => {
+    initMap();
     fetchNeighborhoods();
     fetchCuisines();
 });
@@ -68,19 +69,25 @@ fillCuisinesHTML = (cuisines = self.cuisines) => {
 }
 
 /**
- * Initialize Google map, called from HTML.
+ * Initialize Leaflet map, called from HTML.
  */
-window.initMap = () => {
-    let loc = {
-        lat: 40.722216,
-        lng: -73.987501
-    };
-    self.map = new google.maps.Map(document.getElementById('map'), {
+initMap = () => {
+    self.newMap = L.map('map', {
+        center: [40.722216, -73.987501],
         zoom: 12,
-        center: loc,
-        scrollwheel: false
+        scrollWheelZoom: false
     });
-}
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}', {
+        mapboxToken: 'pk.eyJ1IjoidHVmMzc1MDQiLCJhIjoiY2pqZTZpZ2RmNGk4czN2bzRueTIzb2ZreSJ9.TdVLs0lgWABF2QtqcX1_tA',
+        maxZoom: 18,
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+        '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+        'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        id: 'mapbox.streets'
+    }).addTo(newMap);
+
+    updateRestaurants();
+};
 
 /**
  * Update page and map for current restaurants.
@@ -103,10 +110,6 @@ updateRestaurants = () => {
             fillRestaurantsHTML();
         }
     })
-
-    if (cIndex || nIndex) {
-        document.getElementById("map").style.display = "block";
-    }
 }
 
 /**
@@ -134,29 +137,29 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
     });
     addMarkersToMap();
 
-    /* https://developers.google.com/web/fundamentals/performance/lazy-loading-guidance/images-and-video/ */
-    let lazyImages = [...document.querySelectorAll("img.lazyImg")];
-
-    if ("IntersectionObserver" in window) {
-        let lazyImgObserver = new IntersectionObserver(function(images, observer) {
-            images.forEach(function(image) {
-                if (image.isIntersecting) {
-                    let lazyImg = image.target;
-                    lazyImg.src = lazyImg.dataset.src;
-                    lazyImg.srcset = lazyImg.dataset.srcset;
-                    lazyImg.classList.remove("lazy");
-                    lazyImg.classList.add("restaurant-img");
-                    lazyImgObserver.unobserve(lazyImg);
-                }
-            });
-        });
-
-        lazyImages.forEach(function(lazyImg) {
-            lazyImgObserver.observe(lazyImg);
-        });
-    } else {
-        alert("Intersection Observer is not supported by your browser.");
-    }
+    // /* https://developers.google.com/web/fundamentals/performance/lazy-loading-guidance/images-and-video/ */
+    // let lazyImages = [...document.querySelectorAll("img.lazyImg")];
+    //
+    // if ("IntersectionObserver" in window) {
+    //     let lazyImgObserver = new IntersectionObserver(function(images, observer) {
+    //         images.forEach(function(image) {
+    //             if (image.isIntersecting) {
+    //                 let lazyImg = image.target;
+    //                 lazyImg.src = lazyImg.dataset.src;
+    //                 lazyImg.srcset = lazyImg.dataset.srcset;
+    //                 lazyImg.classList.remove("lazy");
+    //                 lazyImg.classList.add("restaurant-img");
+    //                 lazyImgObserver.unobserve(lazyImg);
+    //             }
+    //         });
+    //     });
+    //
+    //     lazyImages.forEach(function(lazyImg) {
+    //         lazyImgObserver.observe(lazyImg);
+    //     });
+    // } else {
+    //     alert("Intersection Observer is not supported by your browser.");
+    // }
 }
 
 /**
@@ -164,15 +167,21 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
  */
 createRestaurantHTML = (restaurant) => {
     const li = document.createElement('li');
-    const imgBasePath = "img/" + WSHelper.imageUrlForRestaurant(restaurant);
+    let imgBasePath;
+
+    if (WSHelper.imageUrlForRestaurant(restaurant) == "undefined") {
+        imgBasePath = "img/10";
+    } else {
+        imgBasePath = "img/" + WSHelper.imageUrlForRestaurant(restaurant);
+    }
 
     const image = document.createElement('img');
-    // image.className = 'restaurant-img';
-    // image.src = WSHelper.imageUrlForRestaurant(restaurant);
-    image.className = 'lazyImg';
-    image.src = " ";
-    image.setAttribute("data-src", imgBasePath + ".jpg");
-    image.setAttribute("data-srcset", imgBasePath + "-small.jpg 280w, " +
+    image.className = 'restaurant-img';
+    image.src = imgBasePath + ".jpg";
+    // image.className = 'lazyImg';
+    // image.src = " ";
+    image.setAttribute("src", imgBasePath + ".jpg");
+    image.setAttribute("srcset", imgBasePath + "-small.jpg 280w, " +
                                         imgBasePath + "-medium.jpg 400w, " +
                                         imgBasePath + "-large.jpg 600w");
     image.setAttribute("sizes", "(max-width: 399px) 280px, (max-width: 599px) 400px, (max-width: 774px) 600px, " +
@@ -242,10 +251,10 @@ createRestaurantHTML = (restaurant) => {
 addMarkersToMap = (restaurants = self.restaurants) => {
     restaurants.forEach(restaurant => {
         // Add marker to the map
-        const marker = WSHelper.mapMarkerForRestaurant(restaurant, self.map);
-        google.maps.event.addListener(marker, 'click', () => {
-            window.location.href = marker.url
-        });
-        self.markers.push(marker);
+        const marker = WSHelper.mapMarkerForRestaurant(restaurant, self.newMap);
+        marker.on("click", onClick);
+        function onClick() {
+            window.location.href = marker.options.url;
+        }
     });
 }

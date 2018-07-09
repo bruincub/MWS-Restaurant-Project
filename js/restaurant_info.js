@@ -1,21 +1,36 @@
 let restaurant;
-var map;
+var newMap;
 
 /**
- * Initialize Google map, called from HTML.
+ * Initialize map, called from HTML.
  */
-window.initMap = () => {
+document.addEventListener('DOMContentLoaded', (event) => {
+    initMap();
+});
+
+/**
+ * Initialize leaflet map
+ */
+initMap = () => {
     fetchRestaurantFromURL((error, restaurant) => {
         if (error) { // Got an error!
             console.error(error);
         } else {
-            self.map = new google.maps.Map(document.getElementById('map'), {
+            self.newMap = L.map('map', {
+                center: [restaurant.latlng.lat, restaurant.latlng.lng],
                 zoom: 16,
-                center: restaurant.latlng,
-                scrollwheel: false
+                scrollWheelZoom: false
             });
+            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}', {
+                mapboxToken: 'pk.eyJ1IjoidHVmMzc1MDQiLCJhIjoiY2pqZTZpZ2RmNGk4czN2bzRueTIzb2ZreSJ9.TdVLs0lgWABF2QtqcX1_tA',
+                maxZoom: 18,
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                id: 'mapbox.streets'
+            }).addTo(newMap);
             fillBreadcrumb();
-            WSHelper.mapMarkerForRestaurant(self.restaurant, self.map);
+            WSHelper.mapMarkerForRestaurant(self.restaurant, self.newMap);
         }
     });
 }
@@ -50,7 +65,14 @@ fetchRestaurantFromURL = (callback) => {
  */
 fillRestaurantHTML = (restaurant = self.restaurant) => {
     const name = document.getElementById('restaurant-name');
-    const imgBasePath = "img/" + WSHelper.imageUrlForRestaurant(restaurant);
+    let imgBasePath;
+
+    if (WSHelper.imageUrlForRestaurant(restaurant) == "undefined") {
+        imgBasePath = "img/10";
+    } else {
+        imgBasePath = "img/" + WSHelper.imageUrlForRestaurant(restaurant);
+    }
+
     name.innerHTML = restaurant.name;
 
     const address = document.getElementById('restaurant-address');
@@ -59,11 +81,8 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
     const image = document.getElementById('restaurant-img');
     image.className = 'restaurant-img';
     image.src = imgBasePath + ".jpg";
-
-    image.className = 'lazyImg';
-    image.src = ' ';
-    image.setAttribute("data-src", imgBasePath + ".jpg");
-    image.setAttribute("data-srcset", imgBasePath + "-small.jpg 280w, " +
+    image.setAttribute("src", imgBasePath + ".jpg");
+    image.setAttribute("srcset", imgBasePath + "-small.jpg 280w, " +
         imgBasePath + "-medium.jpg 400w, " +
         imgBasePath + "-large.jpg 600w");
     image.setAttribute("sizes", "(max-width: 399px) 280px, (max-width: 599px) 400px, (max-width: 774px) 600px, " +
@@ -114,32 +133,6 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
     }
     // fill reviews
     fillReviewsHTML();
-
-    /* https://developers.google.com/web/fundamentals/performance/lazy-loading-guidance/images-and-video/ */
-    let lazyImages = [...document.querySelectorAll("img.lazyImg")];
-
-    if ("IntersectionObserver" in window) {
-        let lazyImgObserver = new IntersectionObserver(function(images, observer) {
-            images.forEach(function(image) {
-                if (image.isIntersecting) {
-                    let lazyImg = image.target;
-                    lazyImg.src = lazyImg.dataset.src;
-                    lazyImg.srcset = lazyImg.dataset.srcset;
-                    lazyImg.classList.remove("lazy");
-                    lazyImg.classList.add("restaurant-img");
-                    lazyImgObserver.unobserve(lazyImg);
-                }
-            });
-        });
-
-        lazyImages.forEach(function(lazyImg) {
-            lazyImgObserver.observe(lazyImg);
-        });
-    } else {
-        alert("Intersection Observer is not supported by your browser.");
-    }
-
-    document.getElementById("map").style.display = "block";
 }
 
 /**

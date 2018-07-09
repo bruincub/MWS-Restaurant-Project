@@ -96,74 +96,6 @@ class WSHelper {
                 });
             }
         });
-
-        /*if (count) {
-            _dbPromise.then(function(db) {
-                let tx2 = db.transaction("restaurants", "readonly");
-                let store2 = tx2.objectStore("restaurants");
-
-                return store2.getAll();
-            }).then(function(restaurants) {
-                callback(null, restaurants);
-            })
-        } else {
-            fetch(WSHelper.WS_URL + `/Restaurants`).then(function (response) {
-                if (response.ok) {
-                    _dbPromise.then(function (db) {
-                        let tx3 = db.transaction("restaurants", "readonly");
-                        let store3 = tx3.objectStore("restaurants");
-
-                        let restaurants = response.clone().json();
-
-                        restaurants.then(function (r) {
-                            r.forEach(function (restaurant) {
-                                store3.put(restaurant);
-                            });
-                        });
-
-                        return response.json();
-                    }).then(function (restaurants) {
-                        callback(null, restaurants);
-                    });
-                } else {
-                    const error = (`Request failed. Returned status of ${xhr.status}`);
-                    callback(error, null);
-                }
-            });
-        }*/
-
-
-        // .then(function(count) {
-        //     _dbPromise.then(function(db) {
-        //         let tx2 = db.transaction("restaurants", "readwrite");
-        //         let store2 = tx2.objectStore("restaurants");
-        //
-        //         if (count) {
-        //             return store2.getAll();
-        //         } else {
-        //             return fetch(WSHelper.WS_URL + `/Restaurants`).then(function (response) {
-        //                 if (response.ok) {
-        //                     let restaurants = response.clone().json();
-        //
-        //                     restaurants.then(function (r) {
-        //                         r.forEach(function (restaurant) {
-        //                             store2.put(restaurant);
-        //                         });
-        //                     });
-        //
-        //                     return response.json();
-        //                 } else {
-        //                     const error = (`Request failed. Returned status of ${xhr.status}`);
-        //                     callback(error, null);
-        //                 }
-        //             });
-        //         }
-        //     });
-        // }).then(function(restaurants) {
-        //         callback(null, restaurants);
-        // }).catch(function(error) {
-        //         callback(error, null);
-        // });
     }
 
     /**
@@ -305,13 +237,13 @@ class WSHelper {
      * Map marker for a restaurant.
      */
     static mapMarkerForRestaurant(restaurant, map) {
-        const marker = new google.maps.Marker({
-            position: restaurant.latlng,
-            title: restaurant.name,
-            url: WSHelper.urlForRestaurant(restaurant),
-            map: map,
-            animation: google.maps.Animation.DROP}
-        );
+        // https://leafletjs.com/reference-1.3.0.html#marker
+        const marker = new L.marker([restaurant.latlng.lat, restaurant.latlng.lng],
+            {title: restaurant.name,
+                alt: restaurant.name,
+                url: WSHelper.urlForRestaurant(restaurant)
+            });
+        marker.addTo(newMap);
         return marker;
     }
 
