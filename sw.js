@@ -10,14 +10,14 @@ self.addEventListener('install', function(event) {
         // Cache resources for offline first
         caches.open(staticCache).then(function(cache) {
             return cache.addAll([
+                '/',
                 'index.html',
                 'restaurant.html',
                 'js/common.js',
                 'js/wshelper.js',
                 'js/main.js',
                 'js/idb/idb.js',
-                'js/restaurant_info.js',
-                'css/styles.css'
+                'js/restaurant_info.js'
             ]);
         })
     );
