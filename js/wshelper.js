@@ -54,23 +54,23 @@ class WSHelper {
         // xhr.send();
         const _dbPromise = WSHelper.openDatabase();
 
-        _dbPromise.then(function(db) {
-            let tx = db.transaction("restaurants", "readonly");
-            let store = tx.objectStore("restaurants");
-
-            return store.count();
-        }).then(function(count) {
-            if (count) {
-                _dbPromise.then(function(db) {
-                    let tx = db.transaction("restaurants", "readonly");
-                    let store = tx.objectStore("restaurants");
-
-                    console.log("getting from db");
-                    return store.getAll();
-                }).then(function(restaurants) {
-                    callback(null, restaurants);
-                })
-            } else {
+        // _dbPromise.then(function(db) {
+        //     let tx = db.transaction("restaurants", "readonly");
+        //     let store = tx.objectStore("restaurants");
+        //
+        //     return store.count();
+        // }).then(function(count) {
+        //     if (count) {
+        //         _dbPromise.then(function(db) {
+        //             let tx = db.transaction("restaurants", "readonly");
+        //             let store = tx.objectStore("restaurants");
+        //
+        //             console.log("getting from db");
+        //             return store.getAll();
+        //         }).then(function(restaurants) {
+        //             callback(null, restaurants);
+        //         });
+        //     } else {
                 fetch(WSHelper.WS_URL + `/Restaurants`).then(function (response) {
                     if (response.ok) {
                         _dbPromise.then(function(db) {
@@ -82,7 +82,7 @@ class WSHelper {
                                     let store = tx.objectStore("restaurants");
 
                                     store.put(restaurant);
-                                })
+                                });
                             });
 
                             return restaurants;
@@ -93,32 +93,41 @@ class WSHelper {
                         const error = (`Request failed. Returned status of ${xhr.status}`);
                         callback(error, null);
                     }
+                }).catch(function(error) {
+                    _dbPromise.then(function(db) {
+                        let tx = db.transaction("restaurants", "readonly");
+                        let store = tx.objectStore("restaurants");
+
+                        return store.getAll();
+                    }).then(function(restaurants) {
+                       callback(null, restaurants);
+                    });
                 });
-            }
-        });
+            // }
+        // });
     }
 
     /**
      * Fetch a restaurant by its ID.
      */
     static fetchRestaurantById(id, callback) {
-        // fetch all restaurants with proper error handling.
-        // WSHelper.fetchRestaurants((error, restaurants) => {
-        //     if (error) {
-        //         callback(error, null);
-        //     } else {
-        //         const restaurant = restaurants.find(r => r.id == id);
-        //         if (restaurant) { // Got the restaurant
-        //             callback(null, restaurant);
-        //         } else { // Restaurant does not exist in the database
-        //             callback('Restaurant does not exist', null);
-        //         }
-        //     }
-        // });
+        const _dbPromise = WSHelper.openDatabase();
 
         fetch(WSHelper.WS_URL + `/Restaurants/${id}`).then(function(response) {
             if (response.ok) {
-                return response.json();
+                // return response.json();
+                return _dbPromise.then(function(db) {
+                    let restaurant = response.clone().json();
+
+                    response.json().then(function(r) {
+                        let tx = db.transaction("restaurants", "readwrite");
+                        let store = tx.objectStore("restaurants");
+
+                        store.put(r);
+                    });
+
+                    return restaurant;
+                });
             } else {
                 const error = (`Request failed. Returned status of ${xhr.status}`);
                 callback(error, null);
@@ -126,7 +135,14 @@ class WSHelper {
         }).then(function(restaurant) {
             callback(null, restaurant);
         }).catch(function(error) {
-            callback(error, null);
+            _dbPromise.then(function(db) {
+                let tx = db.transaction("restaurants", "readonly");
+                let store = tx.objectStore("restaurants");
+
+                return store.get(parseInt(id));
+            }).then(function(restaurant) {
+               callback(null, restaurant);
+            });
         });
     }
 
@@ -246,5 +262,4 @@ class WSHelper {
         marker.addTo(newMap);
         return marker;
     }
-
 }

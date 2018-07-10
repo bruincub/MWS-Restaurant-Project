@@ -1,8 +1,8 @@
 let restaurants,
     neighborhoods,
-    cuisines;
-var newMap;
-var markers = [];
+    cuisines
+var newMap
+var markers = []
 
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
@@ -136,30 +136,6 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
         ul.append(createRestaurantHTML(restaurant));
     });
     addMarkersToMap();
-
-    // /* https://developers.google.com/web/fundamentals/performance/lazy-loading-guidance/images-and-video/ */
-    // let lazyImages = [...document.querySelectorAll("img.lazyImg")];
-    //
-    // if ("IntersectionObserver" in window) {
-    //     let lazyImgObserver = new IntersectionObserver(function(images, observer) {
-    //         images.forEach(function(image) {
-    //             if (image.isIntersecting) {
-    //                 let lazyImg = image.target;
-    //                 lazyImg.src = lazyImg.dataset.src;
-    //                 lazyImg.srcset = lazyImg.dataset.srcset;
-    //                 lazyImg.classList.remove("lazy");
-    //                 lazyImg.classList.add("restaurant-img");
-    //                 lazyImgObserver.unobserve(lazyImg);
-    //             }
-    //         });
-    //     });
-    //
-    //     lazyImages.forEach(function(lazyImg) {
-    //         lazyImgObserver.observe(lazyImg);
-    //     });
-    // } else {
-    //     alert("Intersection Observer is not supported by your browser.");
-    // }
 }
 
 /**
@@ -178,8 +154,6 @@ createRestaurantHTML = (restaurant) => {
     const image = document.createElement('img');
     image.className = 'restaurant-img';
     image.src = imgBasePath + ".jpg";
-    // image.className = 'lazyImg';
-    // image.src = " ";
     image.setAttribute("src", imgBasePath + ".jpg");
     image.setAttribute("srcset", imgBasePath + "-small.jpg 280w, " +
                                         imgBasePath + "-medium.jpg 400w, " +
