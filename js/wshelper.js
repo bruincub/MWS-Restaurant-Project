@@ -39,72 +39,40 @@ class WSHelper {
      * Fetch all restaurants.
      */
     static fetchRestaurants(callback) {
-        // let xhr = new XMLHttpRequest();
-        // xhr.open('GET', WSHelper.WS_URL);
-        // xhr.onload = () => {
-        //     if (xhr.status === 200) { // Got a success response from server!
-        //         const json = JSON.parse(xhr.responseText);
-        //         const restaurants = json.restaurants;
-        //         callback(null, restaurants);
-        //     } else { // Oops!. Got an error from server.
-        //         const error = (`Request failed. Returned status of ${xhr.status}`);
-        //         callback(error, null);
-        //     }
-        // };
-        // xhr.send();
         const _dbPromise = WSHelper.openDatabase();
 
-        // _dbPromise.then(function(db) {
-        //     let tx = db.transaction("restaurants", "readonly");
-        //     let store = tx.objectStore("restaurants");
-        //
-        //     return store.count();
-        // }).then(function(count) {
-        //     if (count) {
-        //         _dbPromise.then(function(db) {
-        //             let tx = db.transaction("restaurants", "readonly");
-        //             let store = tx.objectStore("restaurants");
-        //
-        //             console.log("getting from db");
-        //             return store.getAll();
-        //         }).then(function(restaurants) {
-        //             callback(null, restaurants);
-        //         });
-        //     } else {
-                fetch(WSHelper.WS_URL + `/Restaurants`).then(function (response) {
-                    if (response.ok) {
-                        _dbPromise.then(function(db) {
-                            let restaurants = response.clone().json();
+        fetch(WSHelper.WS_URL + `/Restaurants`).then(function (response) {
+            if (response.ok) {
+                _dbPromise.then(function(db) {
+                    let restaurants = response.clone().json();
 
-                            response.json().then(function(r) {
-                                r.forEach(function(restaurant) {
-                                    let tx = db.transaction("restaurants", "readwrite");
-                                    let store = tx.objectStore("restaurants");
+                    response.json().then(function(r) {
+                        r.forEach(function(restaurant) {
+                            let tx = db.transaction("restaurants", "readwrite");
+                            let store = tx.objectStore("restaurants");
 
-                                    store.put(restaurant);
-                                });
-                            });
-
-                            return restaurants;
-                        }).then(function (restaurants) {
-                            callback(null, restaurants);
+                            store.put(restaurant);
                         });
-                    } else {
-                        const error = (`Request failed. Returned status of ${xhr.status}`);
-                        callback(error, null);
-                    }
-                }).catch(function(error) {
-                    _dbPromise.then(function(db) {
-                        let tx = db.transaction("restaurants", "readonly");
-                        let store = tx.objectStore("restaurants");
-
-                        return store.getAll();
-                    }).then(function(restaurants) {
-                       callback(null, restaurants);
                     });
+
+                    return restaurants;
+                }).then(function (restaurants) {
+                    callback(null, restaurants);
                 });
-            // }
-        // });
+            } else {
+                const error = (`Request failed. Returned status of ${xhr.status}`);
+                callback(error, null);
+            }
+        }).catch(function(error) {
+            _dbPromise.then(function(db) {
+                let tx = db.transaction("restaurants", "readonly");
+                let store = tx.objectStore("restaurants");
+
+                return store.getAll();
+            }).then(function(restaurants) {
+               callback(null, restaurants);
+            });
+        });
     }
 
     /**
@@ -115,7 +83,6 @@ class WSHelper {
 
         fetch(WSHelper.WS_URL + `/Restaurants/${id}`).then(function(response) {
             if (response.ok) {
-                // return response.json();
                 return _dbPromise.then(function(db) {
                     let restaurant = response.clone().json();
 
