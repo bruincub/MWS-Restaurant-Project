@@ -199,6 +199,22 @@ createRestaurantHTML = (restaurant) => {
 
     li.append(image);
 
+    const isFavorite = (restaurant.is_favorite === 'true');
+	const favBtn = document.createElement('button');
+
+	favBtn.id = 'favBtn' + restaurant.id;
+
+	if (isFavorite) {
+		favBtn.className = 'favBtn favorited';
+	} else {
+		favBtn.className = 'favBtn';
+	}
+
+	favBtn.setAttribute("aria-label", "favorite");
+	favBtn.innerHTML = "&#10084;";
+	favBtn.value = restaurant.id;
+	li.append(favBtn);
+
     const name = document.createElement('h1');
     name.innerHTML = restaurant.name;
     li.append(name);
