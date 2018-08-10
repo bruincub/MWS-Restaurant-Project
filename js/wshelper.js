@@ -214,11 +214,12 @@ class WSHelper {
 				if (response.ok) {
 					// Store in IndexedDB
 					return _dbPromise.then(function(db) {
-						let tx = db.transaction("reviews", "readwrite");
-						let store = tx.objectStore("reviews");
 						let review = response.clone().json();
 
 						response.json().then(function(r) {
+                            let tx = db.transaction("reviews", "readwrite");
+                            let store = tx.objectStore("reviews");
+
 							store.put(r);
 						});
 

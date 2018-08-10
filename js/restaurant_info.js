@@ -284,6 +284,7 @@ document.getElementById("submitReviewBtn").addEventListener("click", function(e)
 
 		WSHelper.postRestaurantReview(restaurantId, (msg, review) => {
 			WSHelper.showPopdown(msg);
+			form.reset();
 			addReviewHTML(review);
 		});
 	}
