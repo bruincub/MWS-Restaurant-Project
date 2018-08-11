@@ -78,11 +78,13 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 
 	favBtn.id = 'favBtn' + restaurant.id;
 
-	if (isFavorite) {
-		favBtn.className = 'favBtn favorited';
-	} else {
-		favBtn.className = 'favBtn';
-	}
+    if (isFavorite) {
+        favBtn.className = 'favBtn favorited';
+        favBtn.setAttribute('aria-label', 'Remove from favorites');
+    } else {
+        favBtn.className = 'favBtn';
+        favBtn.setAttribute('aria-label', 'Add to favorites');
+    }
 
 	favBtn.value = restaurant.id;
 

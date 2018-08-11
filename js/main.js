@@ -206,11 +206,12 @@ createRestaurantHTML = (restaurant) => {
 
 	if (isFavorite) {
 		favBtn.className = 'favBtn favorited';
+		favBtn.setAttribute('aria-label', 'Remove from favorites');
 	} else {
 		favBtn.className = 'favBtn';
+		favBtn.setAttribute('aria-label', 'Add to favorites');
 	}
 
-	favBtn.setAttribute("aria-label", "favorite");
 	favBtn.innerHTML = "&#10084;";
 	favBtn.value = restaurant.id;
 	li.append(favBtn);
@@ -229,6 +230,7 @@ createRestaurantHTML = (restaurant) => {
 
     const more = document.createElement('a');
     more.innerHTML = 'View Details';
+    more.setAttribute('aria-label', 'View details for ' + restaurant.name)
     more.href = WSHelper.urlForRestaurant(restaurant);
     li.append(more);
 
